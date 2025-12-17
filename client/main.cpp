@@ -1,6 +1,11 @@
-#include "utils.hpp"
+#include "C:\Users\Simón\Desktop\elMejorPackOpener\elMejorPackOpener\utils.hpp"
+#include "cliente.hpp"
 using namespace :: std;
+
 bool inicioOk = false;
+SOCKET conexion;
+#define MIN 1
+#define MAX 3
 int main(){
     iniciarPrograma();
     Sleep(10000);
@@ -10,11 +15,18 @@ int main(){
 void iniciarPrograma(){
     crearHilos();
     
+
+
+
+    shutdown(conexion, SD_BOTH);
+    closesocket(conexion);
+    WSACleanup();
 }
 void crearHilos(){
     std::thread hiloPantalla(pantalla);
     hiloPantalla.detach();
-
+    std::thread hiloConexion(crearConexion);
+    hiloConexion.join();
 }
 void pantalla(){
     pantallaCargaInicio();
@@ -34,9 +46,6 @@ void pantalla(){
     
 }
 
-static void gotoxy(short x, short y) {
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{x, y});
-}
 
 void pantallaCargaInicio(){
     cout << setfill('-') << setw(70) << "" << endl;
@@ -66,7 +75,7 @@ void pantallaCargaInicio(){
         cout << string(k, '.');       
         Sleep(500);
         i++;
-        if(i == 3)
+        if(inicioOk)
             break;
     } 
     dotsX = 36;
@@ -75,6 +84,15 @@ void pantallaCargaInicio(){
     Sleep(1000);
 }
 
-void clear(){
-    cout << "\x1b[2J\x1b[H";
+void crearConexion(){
+    auto config = readConfigKV("cliente.config");
+    const char* host = config["host"].c_str();
+    const char* port = config["port"].c_str();
+    conexion = conectar(host,port);
+    if(conexion == INVALID_SOCKET){
+        cout << "Conexion invalida cerrando programa";
+        abort();
+    }
+    randomWait(MIN,MAX);
+    inicioOk = true;
 }
