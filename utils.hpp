@@ -11,6 +11,7 @@
 #include <fstream>
 #include <string>
 #include <random>
+#include <vector>
 
 void clear();
 void gotoxy(short x, short y);

@@ -1,11 +1,14 @@
 #include "C:\Users\Simón\Desktop\elMejorPackOpener\elMejorPackOpener\utils.hpp"
 #include "cliente.hpp"
 using namespace :: std;
+using std::thread;
 
 bool inicioOk = false;
 SOCKET conexion;
 #define MIN 1
 #define MAX 3
+const char* port= "7777";
+const char* host="127.0.0.1";
 int main(){
     iniciarPrograma();
     Sleep(10000);
@@ -23,9 +26,9 @@ void iniciarPrograma(){
     WSACleanup();
 }
 void crearHilos(){
-    std::thread hiloPantalla(pantalla);
+    thread hiloPantalla(pantalla);
     hiloPantalla.detach();
-    std::thread hiloConexion(crearConexion);
+    thread hiloConexion(crearConexion);
     hiloConexion.join();
 }
 void pantalla(){
@@ -85,9 +88,6 @@ void pantallaCargaInicio(){
 }
 
 void crearConexion(){
-    auto config = readConfigKV("cliente.config");
-    const char* host = config["host"].c_str();
-    const char* port = config["port"].c_str();
     conexion = conectar(host,port);
     if(conexion == INVALID_SOCKET){
         cout << "Conexion invalida cerrando programa";
