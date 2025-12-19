@@ -6,27 +6,15 @@ using String = std::string;
 template <typename T>
 using vec = std::vector<T>;
 using FStream = std::fstream;
-extern FStream archivoMaestro;
+using UnorderedMap = std::unordered_map<String,Jugador>;
 
-enum rarezas{COMUN,EPICA,SUPEREPICA,LEGENDARIA};
-class Carta{
-    public:
-        Carta(String jugador, int media,enum rarezas rareza);
-        const String& jugador() const;
-        int media() const;
-        rarezas rareza() const;
-        void setJugador(String jugadorNuevo);
-        void setMedia(int mediaNueva);
-        void setRareza(enum rarezas rarezaNueva);
-    private:
-        String jugador_;
-        int media_;
-        enum rarezas rareza_;
-};
+extern FStream archivoMaestro;
+extern Jugadores jugadores;
+
 
 class Jugador{
     public:
-        Jugador(String nombre, double oro, vec<Carta> cartas);
+        Jugador(String nombre = "", double oro = 0.0 , vec<Carta> cartas = {});
         const String& nombre() const;
         double oro() const;
         void setNombre(String nombreNuevo);
@@ -41,17 +29,20 @@ class Jugador{
 
 class Jugadores{
     public: 
-        Jugadores(vec<Jugador> jugadores);
-        const vec<Jugador>& jugadores();
-        bool setJugadores(vec<Jugador> jugadoresNuevos);
+        Jugadores(UnorderedMap jugadores);
+        const UnorderedMap& jugadores()const;
+        bool setJugadores(UnorderedMap jugadoresNuevos);
         bool agregarJugador(Jugador jugador);
+        int cantidadJugadores()const;
     private:
-        vec<Jugador> jugadores_;
+        UnorderedMap jugadores_;
 };
 
 void iniciarServidor();
 void pantallaInicio();
 void recuperarInfo();
 void iniciarConexiones();
-
+void leerStringU8(std::string& out);
+void leerUnJugador(string& nombre, double& oro, vec<Carta>& cartas);
+Carta leerUnaCarta();
 #endif // SERVER_H

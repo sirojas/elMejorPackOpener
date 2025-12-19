@@ -26,29 +26,12 @@ bool Jugador::agregarCarta(const Carta& carta){
     }
 }
 
-const String& Carta::jugador() const{
-    return jugador_;
-}
-int Carta::media() const{
-    return media_;
-}
-rarezas Carta::rareza() const{
-    return rareza_;
-}
-void Carta::setJugador(String jugadorNuevo){
-    jugador_ = jugadorNuevo;
-}
-void Carta::setMedia(int mediaNueva){
-    media_ = mediaNueva;
-}
-void Carta::setRareza(enum rarezas rarezaNueva){
-    rareza_ = rarezaNueva;
-}
 
-const vec<Jugador>& Jugadores::jugadores(){
+
+const UnorderedMap& Jugadores::jugadores()const{
     return jugadores_;
 }
-bool Jugadores::setJugadores(vec<Jugador> jugadoresNuevos){
+bool Jugadores::setJugadores(UnorderedMap jugadoresNuevos){
     if(jugadoresNuevos.size() >= 10){
         cout << "maximo de jugadores alcanzado"<< endl;
         return false;
@@ -64,7 +47,11 @@ bool Jugadores::agregarJugador(Jugador jugador){
         return false;
     }
     else{
-        jugadores_.push_back(jugador);
+        jugadores_[jugador.nombre()] = jugador;
         return true;
     }
+}
+
+int Jugadores::cantidadJugadores()const{
+    return jugadores_.size();
 }

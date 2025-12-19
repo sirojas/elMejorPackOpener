@@ -1,5 +1,7 @@
 #include "utils.hpp"
 using namespace :: std;
+using String = std::string;
+
 void gotoxy(short x, short y) {
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), COORD{x, y});
 }
@@ -79,4 +81,29 @@ int randomEntre(int a, int b){
 void randomWait(int min,int max){
     int segundos = randomEntre(min,max)*1000;
     Sleep(segundos);
+}
+
+const String& Carta::jugador() const{
+    return jugador_;
+}
+int Carta::media() const{
+    return media_;
+}
+rarezas Carta::rareza() const{
+    return rareza_;
+}
+void Carta::setJugador(String jugadorNuevo){
+    jugador_ = jugadorNuevo;
+}
+void Carta::setMedia(int mediaNueva){
+    media_ = mediaNueva;
+}
+void Carta::setRareza(enum rarezas rarezaNueva){
+    rareza_ = rarezaNueva;
+}
+double Carta::valor() const{
+    return valor_;
+}
+void Carta::setValor(double valorNuevo){
+    valor_ = valorNuevo;
 }

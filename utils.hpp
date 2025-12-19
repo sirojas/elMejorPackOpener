@@ -13,6 +13,25 @@
 #include <random>
 #include <vector>
 
+enum rarezas{COMUN,EPICA,SUPEREPICA,LEGENDARIA};
+class Carta{
+    public:
+        Carta(String jugador, int media,enum rarezas rareza, double valor);
+        const String& jugador() const;
+        int media() const;
+        rarezas rareza() const;
+        double valor() const;
+        void setJugador(String jugadorNuevo);
+        void setMedia(int mediaNueva);
+        void setRareza(enum rarezas rarezaNueva);
+        void setValor(double valorNuevo);
+    private:
+        String jugador_;
+        int media_;
+        enum rarezas rareza_;
+        double valor_;
+};
+
 void clear();
 void gotoxy(short x, short y);
 std::unordered_map<std::string, std::string> readConfigKV(const std::string& path);
