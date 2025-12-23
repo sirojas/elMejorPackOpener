@@ -13,6 +13,10 @@
 #include <random>
 #include <vector>
 
+
+using String = std::string;
+
+
 enum rarezas{COMUN,EPICA,SUPEREPICA,LEGENDARIA};
 class Carta{
     public:
@@ -37,5 +41,9 @@ void gotoxy(short x, short y);
 std::unordered_map<std::string, std::string> readConfigKV(const std::string& path);
 SOCKET conectar(const char* host, const char* port);
 void randomWait(int min,int max);
+bool sendAll(SOCKET s, const char* data, int len);
+bool recvAll(SOCKET s, char* data, int len);
+bool sendString(SOCKET s, const std::string& msg);
+bool recvString(SOCKET s, std::string& out);
 
 #endif // UTILS_H

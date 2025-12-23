@@ -2,12 +2,14 @@
 #include "server.hpp"
 using namespace :: std;
 using std::fstream;
+using std::thread;
 fstream archivoMaestro;
 Jugadores jugadores;
+SOCKET socketEscucha = INVALID_SOCKET;
 
 int main(){
     iniciarServidor();
-    iniciarConexiones();
+    
 
     
     return 0;
@@ -15,6 +17,9 @@ int main(){
 void iniciarServidor(){
     pantallaInicio();
     recuperarInfo();
+    iniciarListener("7777");
+    thread conexiones(iniciarConexiones);
+    conexiones.join();    //join por ahora cuando haya funcion para cerrar el server es detach
 }
 void pantallaInicio(){
     cout << setfill('-') << setw(70) << "" << endl;
@@ -68,7 +73,7 @@ void recuperarInfo(){
         jugadores.agregarJugador(player);
         cartas.clear();
     }
-    cout << "Informacion recuperada con exito, cantidad de jugadores que hay: " << jugadores.cantidadJugadores();
+    cout << "Informacion recuperada con exito, cantidad de jugadores que hay: " << jugadores.cantidadJugadores() << endl;
 }
 void leerStringU8(std::string& out) {
     uint8_t len = 0;
@@ -104,7 +109,95 @@ void leerUnJugador(string& nombre, double& oro, vec<Carta>& cartas){
         cartas.push_back(leerUnaCarta());
     }
 }
+bool iniciarListener(const char* port) {
+    WSADATA wsa{};
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+        std::cerr << "WSAStartup fallo: " << WSAGetLastError() << "\n";
+        return false;
+    }
+
+    addrinfo hints{};
+    hints.ai_family   = AF_INET;        
+    hints.ai_socktype = SOCK_STREAM;    
+    hints.ai_protocol = IPPROTO_TCP;
+    hints.ai_flags    = AI_PASSIVE;     
+
+    addrinfo* res = nullptr;
+    if (getaddrinfo(nullptr, port, &hints, &res) != 0) {
+        std::cerr << "getaddrinfo fallo: " << WSAGetLastError() << "\n";
+        WSACleanup();
+        return false;
+    }
+
+    socketEscucha = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (socketEscucha == INVALID_SOCKET) {
+        std::cerr << "socket fallo: " << WSAGetLastError() << "\n";
+        freeaddrinfo(res);
+        WSACleanup();
+        return false;
+    }
+
+    
+    int yes = 1;
+    setsockopt(socketEscucha, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));
+
+    if (bind(socketEscucha, res->ai_addr, (int)res->ai_addrlen) == SOCKET_ERROR) {
+        std::cerr << "bind fallo: " << WSAGetLastError() << "\n";
+        closesocket(socketEscucha);
+        socketEscucha = INVALID_SOCKET;
+        freeaddrinfo(res);
+        WSACleanup();
+        return false;
+    }
+
+    freeaddrinfo(res);
+
+    if (listen(socketEscucha, SOMAXCONN) == SOCKET_ERROR) {
+        std::cerr << "listen fallo: " << WSAGetLastError() << "\n";
+        closesocket(socketEscucha);
+        socketEscucha = INVALID_SOCKET;
+        WSACleanup();
+        return false;
+    }
+
+    std::cout << "Listener listo en puerto " << port << "\n";
+    return true;
+}
 void iniciarConexiones(){
+    SOCKET socketNuevo;
+    string usuario;
+    while(true){
+        if(!aceptarConexion(socketNuevo)) continue;
+        usuario = handshake(socketNuevo);
+        thread acciones(gestionarServer,socketNuevo,usuario);
+        acciones.detach();
+    }
+}
+
+bool aceptarConexion(SOCKET& socketNuevo) {
+    socketNuevo = accept(socketEscucha, nullptr, nullptr);
+
+    if (socketNuevo == INVALID_SOCKET) {
+        std::cerr << "accept fallo: " << WSAGetLastError() << "\n";
+        return false;
+    }
+    return true;
+}
+
+
+void cerrarListener() {
+    if (socketEscucha != INVALID_SOCKET) {
+        closesocket(socketEscucha);
+        socketEscucha = INVALID_SOCKET;
+    }
+    WSACleanup();
+}
+string handshake(SOCKET socket){
+    string usuario;
+    recvString(socket,usuario);
+    return usuario;
+}
+void gestionarServer(SOCKET socket,string usuario){
 
 }
 void guardarInfo(){

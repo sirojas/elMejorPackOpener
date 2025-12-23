@@ -7,7 +7,7 @@
 enum acciones{FIN};
 extern bool inicioOk;
 extern SOCKET conexion;
-
+extern String usuario;
 
 //posible clientes.h
 void iniciarPrograma();

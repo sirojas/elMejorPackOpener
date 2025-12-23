@@ -9,6 +9,8 @@ SOCKET conexion;
 #define MAX 3
 const char* port= "7777";
 const char* host="127.0.0.1";
+string usuario;
+
 int main(){
     iniciarPrograma();
     Sleep(10000);
@@ -33,6 +35,9 @@ void crearHilos(){
 }
 void pantalla(){
     pantallaCargaInicio();
+    clear();
+    cout << "Ingrese nombre de usuario: ";
+    cin >> usuario;
     enum acciones input;
     /*do{
       pedirInput(input);

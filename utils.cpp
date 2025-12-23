@@ -107,3 +107,36 @@ double Carta::valor() const{
 void Carta::setValor(double valorNuevo){
     valor_ = valorNuevo;
 }
+bool sendAll(SOCKET s, const char* data, int len) {
+    int sent = 0;
+    while (sent < len) {
+        int n = send(s, data + sent, len - sent, 0);
+        if (n <= 0) return false;
+        sent += n;
+    }
+    return true;
+}
+
+bool recvAll(SOCKET s, char* data, int len) {
+    int recvd = 0;
+    while (recvd < len) {
+        int n = recv(s, data + recvd, len - recvd, 0);
+        if (n <= 0) return false;
+        recvd += n;
+    }
+    return true;
+}
+bool sendString(SOCKET s, const std::string& msg) {
+    uint32_t len = (uint32_t)msg.size();      // largo en bytes
+    if (!sendAll(s, (const char*)&len, sizeof(len))) return false;
+    if (len > 0 && !sendAll(s, msg.data(), (int)len)) return false;
+    return true;
+}
+bool recvString(SOCKET s, std::string& out) {
+    uint32_t len = 0;
+    if (!recvAll(s, (char*)&len, sizeof(len))) return false;
+
+    out.resize(len);
+    if (len > 0 && !recvAll(s, out.data(), (int)len)) return false;
+    return true;
+}
